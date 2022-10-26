@@ -27,6 +27,7 @@ ItemSchema.pre("validate", function(next) {
   next();
 });
 
+// Test
 ItemSchema.methods.slugify = function() {
   this.slug =
     slug(this.title) +
