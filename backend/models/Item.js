@@ -59,4 +59,6 @@ ItemSchema.methods.toJSONFor = function(user) {
   };
 };
 
+ItemSchema.index({title: "text"});
+
 mongoose.model("Item", ItemSchema);
