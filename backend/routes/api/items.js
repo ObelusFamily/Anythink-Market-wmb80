@@ -54,7 +54,7 @@ router.get("/", auth.optional, function(req, res, next) {
   }
 
   if (typeof req.query.title !== "undefined") {
-    query.title = req.query.title
+    query.$text = {$search: req.query.title};
   }
 
   Promise.all([
@@ -74,12 +74,15 @@ router.get("/", auth.optional, function(req, res, next) {
       } else if (req.query.favorited) {
         query._id = { $in: [] };
       }
+      console.log(`Query: ${JSON.stringify(query)}`);
 
       return Promise.all([
         Item.find(query)
           .limit(Number(limit))
           .skip(Number(offset))
-          .sort({ createdAt: "desc" })
+          .sort({ 
+            createdAt: "desc"
+          })
           .exec(),
         Item.count(query).exec(),
         req.payload ? User.findById(req.payload.id) : null
