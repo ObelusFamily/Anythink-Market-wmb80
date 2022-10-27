@@ -53,6 +53,11 @@ router.get("/", auth.optional, function(req, res, next) {
     query.tagList = { $in: [req.query.tag] };
   }
 
+  if (typeof req.query.title !== "undefined") {
+    query.title = new RegExp(`.*${req.query.title}.*`, "i");
+    // query.$text = {$search: req.query.title};
+  }
+
   Promise.all([
     req.query.seller ? User.findOne({ username: req.query.seller }) : null,
     req.query.favorited ? User.findOne({ username: req.query.favorited }) : null
@@ -70,12 +75,15 @@ router.get("/", auth.optional, function(req, res, next) {
       } else if (req.query.favorited) {
         query._id = { $in: [] };
       }
+      console.log(`Query: ${JSON.stringify(query)}`);
 
       return Promise.all([
         Item.find(query)
           .limit(Number(limit))
           .skip(Number(offset))
-          .sort({ createdAt: "desc" })
+          .sort({ 
+            createdAt: "desc"
+          })
           .exec(),
         Item.count(query).exec(),
         req.payload ? User.findById(req.payload.id) : null
